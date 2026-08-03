@@ -5,15 +5,14 @@ import {
   ArrowLeft,
   Calendar,
   MapPin,
-  Quote,
-  User,
   X,
   Heart
 } from 'lucide-react';
-import type { UsPhoto, WishMessage } from './wishesData';
-import { US_PHOTOS, WISHES_MESSAGES } from './wishesData';
+import type { UsPhoto } from './wishesData';
+import { US_PHOTOS } from './wishesData';
 import ChromaGrid from './ChromaGrid';
 import type { ChromaItem } from './ChromaGrid';
+import { WishesCarousel } from './App';
 import './SpecialPage.css';
 
 interface SpecialPageProps {
@@ -23,7 +22,6 @@ interface SpecialPageProps {
 export const SpecialPage: React.FC<SpecialPageProps> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<'us' | 'wishes'>('us');
   const [photos] = useState<UsPhoto[]>(US_PHOTOS);
-  const [wishes] = useState<WishMessage[]>(WISHES_MESSAGES);
   const [selectedPhoto, setSelectedPhoto] = useState<UsPhoto | null>(null);
 
   const chromaItems: ChromaItem[] = photos.map((photo, idx) => ({
@@ -116,46 +114,8 @@ export const SpecialPage: React.FC<SpecialPageProps> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Wishes Grid */}
-          <div className="wishes-grid">
-            {wishes.map((item, idx) => {
-              const accentColor = idx % 2 === 0 ? 'var(--amber)' : 'var(--teal)';
-              return (
-                <div key={item.id} className="wish-card">
-                  <div className="wish-card-header">
-                    <div
-                      className="wish-avatar"
-                      style={{
-                        background: item.avatarColor || 'var(--secondary-ground)',
-                        borderColor: idx % 2 === 0 ? 'rgba(232, 145, 60, 0.3)' : 'rgba(46, 107, 114, 0.3)'
-                      }}
-                    >
-                      <User size={20} color={accentColor} />
-                    </div>
-                    <div className="wish-sender-info">
-                      <h3 className="wish-sender-name">{item.sender}</h3>
-                      <span className="wish-relationship" style={{ color: accentColor }}>
-                        {item.relationship}
-                      </span>
-                      {item.timestamp && (
-                        <span className="wish-time">{item.timestamp}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="wish-body">
-                    <Quote className="wish-quote-bg" size={28} />
-                    <p className="wish-text">{item.message}</p>
-                  </div>
-
-                  <div className="wish-footer" style={{ color: accentColor }}>
-                    <Heart size={12} fill={accentColor} color={accentColor} />
-                    <span>WISHED WITH LOVE</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Single Wish Message Carousel */}
+          <WishesCarousel />
         </section>
       )}
 

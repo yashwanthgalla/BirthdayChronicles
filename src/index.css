@@ -1521,4 +1521,224 @@ body.allow-animations .reveal.active {
   margin-top: 12px;
 }
 
+/* Single Wish Message Carousel Component */
+.wishes-slider-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.wish-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--secondary-ground);
+  border: 1px solid var(--hairlines);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+.wish-nav-arrow.left {
+  left: -24px;
+}
+
+.wish-nav-arrow.right {
+  right: -24px;
+}
+
+.wish-nav-arrow:hover {
+  background: var(--amber);
+  border-color: var(--amber);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 12px 32px rgba(232, 145, 60, 0.4);
+}
+
+.wish-nav-arrow:hover svg {
+  color: var(--ground) !important;
+}
+
+/* 2-Column Single Card Layout */
+.wish-single-card {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 32px;
+  width: 100%;
+  background: var(--secondary-ground);
+  border: 1px solid var(--hairlines);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.wish-card-photo-side {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--hairlines);
+}
+
+.wish-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.wish-single-card:hover .wish-photo-img {
+  transform: scale(1.03);
+}
+
+.wish-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+}
+
+.wish-photo-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 5;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  color: var(--ground);
+}
+
+.wish-card-content-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  height: 100%;
+}
+
+.wish-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  border-bottom: 1px solid var(--hairlines);
+  padding-bottom: 16px;
+}
+
+.wish-sender-title {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 4px 0;
+}
+
+.wish-relation-tag {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wish-date-badge {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.wish-content-body {
+  position: relative;
+  flex: 1;
+}
+
+.wish-large-quote-icon {
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.wish-paragraph-text {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+
+.wish-content-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairlines);
+}
+
+/* Dots & Pagination */
+.wishes-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.wish-dot-pill {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.wish-dot-pill.active {
+  width: 28px;
+  border-radius: 9999px;
+}
+
+@media (max-width: 768px) {
+  .wish-single-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  .wish-card-photo-side {
+    aspect-ratio: 16 / 10;
+  }
+  .wish-nav-arrow.left {
+    left: -12px;
+  }
+  .wish-nav-arrow.right {
+    right: -12px;
+  }
+}
+
 

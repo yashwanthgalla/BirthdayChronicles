@@ -7,7 +7,104 @@ import { WISHES_MESSAGES } from './wishesData';
 import Card from './Card';
 import GalleryView from './GalleryView';
 import SpecialPage from './SpecialPage';
-import { ArrowUp, Quote, User, Heart } from 'lucide-react';
+import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// Single Wish Message Carousel with left photo & right message matter
+export function WishesCarousel() {
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const handlePrev = () => {
+    setCurrentIdx((prev) => (prev === 0 ? WISHES_MESSAGES.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIdx((prev) => (prev === WISHES_MESSAGES.length - 1 ? 0 : prev + 1));
+  };
+
+  const item = WISHES_MESSAGES[currentIdx];
+  const accentColor = currentIdx % 2 === 0 ? 'var(--amber)' : 'var(--teal)';
+
+  return (
+    <div className="wishes-slider-wrapper">
+      <button 
+        className="wish-nav-arrow left" 
+        onClick={handlePrev}
+        aria-label="Previous wish message"
+      >
+        <ChevronLeft size={22} color="var(--ink)" />
+      </button>
+
+      <div className="wish-single-card" key={item.id}>
+        {/* Left Side: Photo */}
+        <div 
+          className="wish-card-photo-side"
+          style={{ borderColor: accentColor }}
+        >
+          <img 
+            src={item.photoUrl || '/wish/wish-1.jpg'} 
+            alt={item.sender}
+            className="wish-photo-img" 
+            onError={(e) => {
+              // Fallback to default souvenir photo if custom /wish/ photo is not found
+              (e.currentTarget as HTMLImageElement).src = '/us/photo_2026-05-22_15-47-57.jpg';
+            }}
+          />
+          <div className="wish-photo-overlay" />
+          <span className="wish-photo-badge" style={{ background: accentColor }}>
+            {item.relationship}
+          </span>
+        </div>
+
+        {/* Right Side: Message Content Matter */}
+        <div className="wish-card-content-side">
+          <div className="wish-content-header">
+            <div>
+              <h3 className="wish-sender-title">{item.sender}</h3>
+              <span className="wish-relation-tag" style={{ color: accentColor }}>
+                {item.relationship}
+              </span>
+            </div>
+            {item.timestamp && (
+              <span className="wish-date-badge">{item.timestamp}</span>
+            )}
+          </div>
+
+          <div className="wish-content-body">
+            <Quote className="wish-large-quote-icon" size={32} style={{ color: accentColor }} />
+            <p className="wish-paragraph-text">{item.message}</p>
+          </div>
+
+          <div className="wish-content-footer" style={{ color: accentColor }}>
+            <Heart size={14} fill={accentColor} color={accentColor} />
+            <span>WISHED WITH LOVE</span>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        className="wish-nav-arrow right" 
+        onClick={handleNext}
+        aria-label="Next wish message"
+      >
+        <ChevronRight size={22} color="var(--ink)" />
+      </button>
+
+      <div className="wishes-carousel-dots">
+        {WISHES_MESSAGES.map((_, idx) => (
+          <button
+            key={idx}
+            className={`wish-dot-pill ${idx === currentIdx ? 'active' : ''}`}
+            onClick={() => setCurrentIdx(idx)}
+            aria-label={`Go to wish ${idx + 1}`}
+            style={{
+              background: idx === currentIdx ? accentColor : 'rgba(237, 231, 220, 0.15)'
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Scroll to top helper on route change
 function ScrollToTop() {
@@ -359,8 +456,8 @@ function MainPortalView() {
         <div className="nav-links">
           <a href="#statement" onClick={(e) => { e.preventDefault(); scrollToSection('statement'); }} className="nav-link">INFO</a>
           <a href="#releases" onClick={(e) => { e.preventDefault(); scrollToSection('releases'); }} className="nav-link">MOMENTS</a>
-          <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }} className="nav-link">ABOUT</a>
           <a href="#wishes" onClick={(e) => { e.preventDefault(); scrollToSection('wishes'); }} className="nav-link">WISHES</a>
+          <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }} className="nav-link">ABOUT</a>
           <button onClick={() => navigate('/gallery')} className="btn-pill">VIEW PHOTOS</button>
         </div>
       </nav>
@@ -552,6 +649,22 @@ function MainPortalView() {
         </div>
       </section>
 
+      {/* 4. Birthday Wishes Section */}
+      <section id="wishes" className="wishes-main-section reveal">
+        <div className="wishes-section-header">
+          <span className="label-caps" style={{ display: 'block', marginBottom: '16px' }}>
+            THE WISHES LOG<span className="accent-dot amber"></span>
+          </span>
+          <h2 className="section-heading">MESSAGES FROM LOVED ONES</h2>
+          <p className="wishes-section-sub">
+            Warm birthday wishes and heartfelt blessings recorded for your special day.
+          </p>
+        </div>
+
+        {/* Wishes Single Card Slider */}
+        <WishesCarousel />
+      </section>
+
       {/* 5. About Birthday Chronicles Section */}
       <section id="about" className="about-chronicles-section">
         <div className="about-numeral">03</div>
@@ -608,60 +721,6 @@ function MainPortalView() {
               <span>VOL. II</span>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* 5. Birthday Wishes Section */}
-      <section id="wishes" className="wishes-main-section reveal">
-        <div className="wishes-section-header">
-          <span className="label-caps" style={{ display: 'block', marginBottom: '16px' }}>
-            THE WISHES LOG<span className="accent-dot amber"></span>
-          </span>
-          <h2 className="section-heading">MESSAGES FROM LOVED ONES</h2>
-          <p className="wishes-section-sub">
-            Warm birthday wishes and heartfelt blessings recorded for your special day.
-          </p>
-        </div>
-
-        {/* Wishes Grid */}
-        <div className="wishes-grid">
-          {WISHES_MESSAGES.map((item, idx) => {
-            const accentColor = idx % 2 === 0 ? 'var(--amber)' : 'var(--teal)';
-            return (
-              <div key={item.id} className="wish-card">
-                <div className="wish-card-header">
-                  <div
-                    className="wish-avatar"
-                    style={{
-                      background: item.avatarColor || 'var(--secondary-ground)',
-                      borderColor: idx % 2 === 0 ? 'rgba(232, 145, 60, 0.3)' : 'rgba(46, 107, 114, 0.3)'
-                    }}
-                  >
-                    <User size={20} color={accentColor} />
-                  </div>
-                  <div className="wish-sender-info">
-                    <h3 className="wish-sender-name">{item.sender}</h3>
-                    <span className="wish-relationship" style={{ color: accentColor }}>
-                      {item.relationship}
-                    </span>
-                    {item.timestamp && (
-                      <span className="wish-time">{item.timestamp}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="wish-body">
-                  <Quote className="wish-quote-bg" size={28} />
-                  <p className="wish-text">{item.message}</p>
-                </div>
-
-                <div className="wish-footer" style={{ color: accentColor }}>
-                  <Heart size={12} fill={accentColor} color={accentColor} />
-                  <span>WISHED WITH LOVE</span>
-                </div>
-              </div>
-            );
-          })}
         </div>
       </section>
 

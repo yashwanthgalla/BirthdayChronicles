@@ -95,7 +95,10 @@ export const US_PHOTOS: UsPhoto[] = [
 
 // ----------------------------------------------------------------------------
 // 2. BIRTHDAY WISHES & MESSAGES
-// Manually add or edit the wishes from friends, family, and loved ones below!
+// Manually add or edit wishes below!
+// To add a photo for a person:
+// Save their picture in public/wish/ (e.g. public/wish/yashu.jpg)
+// and set photoUrl: "/wish/yashu.jpg"
 // ----------------------------------------------------------------------------
 export const WISHES_MESSAGES: WishMessage[] = [
   {
@@ -104,7 +107,8 @@ export const WISHES_MESSAGES: WishMessage[] = [
     relationship: "YOUR FAVORITE PERSON",
     message: "Happy Birthday my love! You deserve all the happiness, laughter, and magic in the world. Thank you for being my constant joy and inspiration.",
     avatarColor: "linear-gradient(135deg, rgba(232, 145, 60, 0.2), var(--secondary-ground))",
-    timestamp: "08.03.2026"
+    timestamp: "08.03.2026",
+    photoUrl: "/wish/favorite-person.jpg"
   },
   {
     id: "wish-2",
@@ -112,7 +116,8 @@ export const WISHES_MESSAGES: WishMessage[] = [
     relationship: "BESTIES",
     message: "Wishing the sweetest, happiest birthday to our favorite girl! May this year bring endless adventures, success, and pure magic!",
     avatarColor: "linear-gradient(135deg, rgba(46, 107, 114, 0.2), var(--secondary-ground))",
-    timestamp: "08.03.2026"
+    timestamp: "08.03.2026",
+    photoUrl: "/wish/besties.jpg"
   },
   {
     id: "wish-3",
@@ -120,6 +125,7 @@ export const WISHES_MESSAGES: WishMessage[] = [
     relationship: "FAMILY",
     message: "Happy Birthday! Sending you tight hugs, endless love, and blessings for a year filled with good health, joy, and dreams come true.",
     avatarColor: "linear-gradient(135deg, rgba(232, 145, 60, 0.2), var(--secondary-ground))",
-    timestamp: "08.03.2026"
+    timestamp: "08.03.2026",
+    photoUrl: "/wish/family.jpg"
   }
 ];
