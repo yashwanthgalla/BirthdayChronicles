@@ -119,15 +119,15 @@
 .chroma-info {
   position: relative;
   z-index: 1;
-  padding: 1rem 1.25rem;
+  padding: 14px 16px;
   color: var(--ink);
   font-family: var(--sans);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
-  background: rgba(10, 12, 14, 0.65);
+  justify-content: center;
+  background: rgba(16, 19, 23, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(237, 231, 220, 0.08);
@@ -135,11 +135,12 @@
 
 .chroma-info .name {
   font-family: var(--display, sans-serif);
-  font-size: 1.1rem;
+  font-size: 15px;
   font-weight: 700;
   color: var(--ink);
   margin: 0;
   text-align: center;
+  letter-spacing: 0.01em;
 }
 
 .chroma-info .role,

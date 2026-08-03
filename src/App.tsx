@@ -1,10 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
+import './SpecialPage.css';
 import { GF_PHOTOS } from './photos';
+import { WISHES_MESSAGES } from './wishesData';
 import Card from './Card';
 import GalleryView from './GalleryView';
 import SpecialPage from './SpecialPage';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Quote, User, Heart } from 'lucide-react';
+
+// Scroll to top helper on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 // Shuffles an array using Fisher-Yates algorithm
 function shuffleArray<T>(array: T[]): T[] {
@@ -68,15 +80,12 @@ function getCardMetadata(path: string) {
   };
 }
 
-
-
-
 const FIRST_HERO_IMAGE = "/yashu/IMG-20250815-WA0005.jpg";
 
-function App() {
-  const [currentView, setCurrentView] = useState<'main' | 'gallery' | 'wishes'>('main');
+function MainPortalView() {
+  const navigate = useNavigate();
 
-  // Hero images array (only the specified single image visible in the hero section)
+  // Hero images array
   const [heroImages] = useState<string[]>([FIRST_HERO_IMAGE]);
 
   // Slides double-buffered state for high performance cross-fade
@@ -91,9 +100,6 @@ function App() {
   const shuffledPool = useRef<string[]>([]);
   const nextPhotoIndex = useRef(0);
   
-  
-
-
   const [cards, setCards] = useState<string[]>(() => {
     const rest = GF_PHOTOS.filter(p => p !== FIRST_HERO_IMAGE);
     const pool = [FIRST_HERO_IMAGE, ...shuffleArray(rest)];
@@ -102,7 +108,7 @@ function App() {
     return pool.slice(0, 6);
   });
 
-  // Refs for scroll elements to target GPU transitions directly
+  // Refs for scroll elements
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const spanLeftRef = useRef<HTMLSpanElement>(null);
@@ -113,6 +119,7 @@ function App() {
   const dotTealRef = useRef<HTMLDivElement>(null);
   const dotAmberRef = useRef<HTMLDivElement>(null);
   const circleWrapRef = useRef<HTMLDivElement>(null);
+  
   // Gestures dragging states
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -125,7 +132,6 @@ function App() {
   const deckRef = useRef<HTMLDivElement>(null);
   const isThrowing = useRef(false);
 
-
   // High-performance double-buffered image cycling
   useEffect(() => {
     if (heroImages.length <= 1) return;
@@ -133,112 +139,114 @@ function App() {
       const nextIdx = (heroIndexRef.current + 1) % heroImages.length;
       heroIndexRef.current = nextIdx;
       
-      // 1. Prepare next image on top layers and trigger opacity fade
       setSlides(prev => ({
         ...prev,
         incoming: heroImages[nextIdx],
         showIncoming: true
       }));
 
-      // 2. Commit to active background and reset incoming layer after transition is done (1.5s)
       setTimeout(() => {
-        setSlides(prev => ({
-          ...prev,
+        setSlides({
           active: heroImages[nextIdx],
+          incoming: heroImages[(nextIdx + 1) % heroImages.length],
           showIncoming: false
-        }));
+        });
       }, 1500);
-
     }, 4500);
 
     return () => clearInterval(timer);
   }, [heroImages]);
 
-  // Buttery-smooth inertial scroll loop targeting DOM nodes directly (skip React renders)
-  useEffect(() => {
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const updateMotionClass = (isReduced: boolean) => {
-      if (isReduced) {
-        document.body.classList.remove('allow-animations');
-      } else {
-        document.body.classList.add('allow-animations');
-      }
-    };
-    
-    updateMotionClass(motionQuery.matches);
-    
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      updateMotionClass(e.matches);
-    };
-    motionQuery.addEventListener('change', handleMotionChange);
+  const seamRef = useRef<HTMLDivElement>(null);
 
-    // Scroll interpolation parameters
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let currentScrollY = 0;
-    let targetScrollY = 0;
-    let rafId = 0;
+  // Scroll Animation Engine using RAF & Direct DOM Updates
+  useEffect(() => {
+    let animationFrameId: number;
 
     const handleScroll = () => {
-      targetScrollY = window.scrollY;
-      const portalThreshold = 700;
-      targetProgress = Math.max(0, Math.min(targetScrollY / portalThreshold, 1));
-    };
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const heroHeight = windowHeight * 1.8;
 
-    const smoothAnimationLoop = () => {
-      // Easing algorithm: current += (target - current) * factor
-      currentProgress += (targetProgress - currentProgress) * 0.085;
-      currentScrollY += (targetScrollY - currentScrollY) * 0.085;
+      const progress = Math.min(Math.max(scrollY / (heroHeight - windowHeight), 0), 1);
+      // Smoothstep easing for silky opening curve
+      const eased = progress * progress * (3 - 2 * progress);
 
-      const p = currentProgress;
-      const s = currentScrollY;
+      if (leftPanelRef.current && rightPanelRef.current) {
+        const translateLeft = eased * -102;
+        const translateRight = eased * 102;
+        const skew = eased * 1.5;
+        leftPanelRef.current.style.transform = `translate3d(${translateLeft}%, 0, 0) skewY(${-skew}deg)`;
+        rightPanelRef.current.style.transform = `translate3d(${translateRight}%, 0, 0) skewY(${skew}deg)`;
+      }
 
-      // Apply transforms directly via DOM style properties (triggers GPU layer composition, zero lag)
-      if (leftPanelRef.current) {
-        leftPanelRef.current.style.transform = `translate3d(${-51 * p}vw, 0, 0)`;
+      if (seamRef.current) {
+        const seamOpacity = Math.max(0, 1 - eased * 2.5);
+        seamRef.current.style.opacity = `${seamOpacity}`;
+        seamRef.current.style.transform = `translateX(-50%) scaleY(${1 + eased * 0.5})`;
       }
-      if (rightPanelRef.current) {
-        rightPanelRef.current.style.transform = `translate3d(${51 * p}vw, 0, 0)`;
+
+      if (spanLeftRef.current && spanRightRef.current) {
+        const textTranslateLeft = eased * -280;
+        const textTranslateRight = eased * 280;
+        const scale = 1 + eased * 0.25;
+        spanLeftRef.current.style.transform = `translate3d(${textTranslateLeft}px, 0, 0) scale(${scale})`;
+        spanRightRef.current.style.transform = `translate3d(${textTranslateRight}px, 0, 0) scale(${scale})`;
       }
-      if (spanLeftRef.current) {
-        spanLeftRef.current.style.transform = `translate3d(${-18 * p}vw, 0, 0)`;
-      }
-      if (spanRightRef.current) {
-        spanRightRef.current.style.transform = `translate3d(${18 * p}vw, 0, 0)`;
-      }
+
       if (titleContainerRef.current) {
-        const scale = 1 + 0.22 * p;
-        const letterSpacing = 0.06 - 0.08 * p;
-        titleContainerRef.current.style.transform = `scale3d(${scale}, ${scale}, 1)`;
-        titleContainerRef.current.style.letterSpacing = `${letterSpacing}em`;
-      }
-      if (bgWrapRef.current) {
-        const bgScale = 1.15 - 0.15 * p;
-        bgWrapRef.current.style.transform = `scale3d(${bgScale}, ${bgScale}, 1)`;
-      }
-      if (duotoneRef.current) {
-        duotoneRef.current.style.opacity = `${p * 0.35}`;
-      }
-      if (dotTealRef.current) {
-        dotTealRef.current.style.transform = `translate3d(calc(-50% - ${40 * p}vw), calc(-50% - ${40 * p}vh), 0)`;
-      }
-      if (dotAmberRef.current) {
-        dotAmberRef.current.style.transform = `translate3d(calc(-50% + ${40 * p}vw), calc(-50% + ${40 * p}vh), 0)`;
-      }
-      if (circleWrapRef.current) {
-        const driftX = s * 0.06;
-        const driftY = s * -0.03;
-        const rotate = s * 0.08;
-        circleWrapRef.current.style.transform = `translate3d(${driftX}px, ${driftY}px, 0) rotate(${rotate}deg)`;
+        titleContainerRef.current.style.opacity = `${Math.max(0, 1 - eased * 1.2)}`;
+        titleContainerRef.current.style.transform = `translate3d(0, ${eased * -60}px, 0)`;
       }
 
-      rafId = requestAnimationFrame(smoothAnimationLoop);
+      if (bgWrapRef.current) {
+        const bgScale = 1.12 - eased * 0.12;
+        const brightness = 0.75 + eased * 0.25;
+        bgWrapRef.current.style.transform = `scale(${bgScale})`;
+        bgWrapRef.current.style.filter = `brightness(${brightness})`;
+      }
+
+      if (duotoneRef.current) {
+        duotoneRef.current.style.opacity = `${0.3 + eased * 0.4}`;
+      }
+
+      if (dotTealRef.current && dotAmberRef.current) {
+        const tealX = Math.sin(eased * Math.PI * 2) * 180;
+        const tealY = eased * -240;
+        const amberX = Math.cos(eased * Math.PI * 2) * -180;
+        const amberY = eased * -240;
+
+        dotTealRef.current.style.transform = `translate3d(${tealX}px, ${tealY}px, 0) scale(${1 + eased * 1.5})`;
+        dotAmberRef.current.style.transform = `translate3d(${amberX}px, ${amberY}px, 0) scale(${1 + eased * 1.5})`;
+        dotTealRef.current.style.opacity = `${Math.max(0, 1 - eased * 1.2)}`;
+        dotAmberRef.current.style.opacity = `${Math.max(0, 1 - eased * 1.2)}`;
+      }
+
+      if (circleWrapRef.current) {
+        const circleY = (scrollY - windowHeight) * 0.15;
+        const rotateDeg = scrollY * 0.05;
+        circleWrapRef.current.style.transform = `translate3d(0, ${circleY}px, 0) rotate(${rotateDeg}deg)`;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    rafId = requestAnimationFrame(smoothAnimationLoop);
+    const onScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
 
-    // Intersection Observer for fade-in animations
+    window.addEventListener('scroll', onScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  // IntersectionObserver for reveal sections
+  useEffect(() => {
+    document.body.classList.add('allow-animations');
+
     const revealElements = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver(
       (entries) => {
@@ -251,12 +259,15 @@ function App() {
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
 
-    revealElements.forEach((el) => observer.observe(el));
+    revealElements.forEach((el) => {
+      observer.observe(el);
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 100) {
+        el.classList.add('active');
+      }
+    });
 
     return () => {
-      motionQuery.removeEventListener('change', handleMotionChange);
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(rafId);
       observer.disconnect();
     };
   }, []);
@@ -284,18 +295,16 @@ function App() {
     setIsDragging(false);
     setThrowingState({ active: true, dir: direction });
     
-    // Simulate swipe out transition completion
     setTimeout(() => {
       const nextPhoto = shuffledPool.current[nextPhotoIndex.current];
       
       setCards((prev) => {
         const next = [...prev];
-        next.shift(); // remove the top swiped card
-        next.push(nextPhoto); // add new card to bottom
+        next.shift();
+        next.push(nextPhoto);
         return next;
       });
 
-      // Update refs & count outside the React StrictMode-run functional state updater
       nextPhotoIndex.current = (nextPhotoIndex.current + 1) % shuffledPool.current.length;
 
       setDragOffset({ x: 0, y: 0 });
@@ -309,14 +318,13 @@ function App() {
     e.currentTarget.releasePointerCapture(e.pointerId);
     
     const deckWidth = deckRef.current?.offsetWidth || 380;
-    const threshold = deckWidth * 0.1; // 10% of deck width
+    const threshold = deckWidth * 0.1;
     
     if (dragOffset.x > threshold) {
       throwCard('right');
     } else if (dragOffset.x < -threshold) {
       throwCard('left');
     } else {
-      // Snap back smoothly
       setIsDragging(false);
       setDragOffset({ x: 0, y: 0 });
     }
@@ -334,22 +342,12 @@ function App() {
     }
   };
 
-  // Scroll smooth anchor links
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-
-  if (currentView === 'gallery') {
-    return <GalleryView onBack={() => setCurrentView('main')} />;
-  }
-
-  if (currentView === 'wishes') {
-    return <SpecialPage onBack={() => setCurrentView('main')} />;
-  }
 
   return (
     <>
@@ -362,14 +360,14 @@ function App() {
           <a href="#statement" onClick={(e) => { e.preventDefault(); scrollToSection('statement'); }} className="nav-link">INFO</a>
           <a href="#releases" onClick={(e) => { e.preventDefault(); scrollToSection('releases'); }} className="nav-link">MOMENTS</a>
           <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }} className="nav-link">ABOUT</a>
-          <button onClick={() => setCurrentView('gallery')} className="btn-pill">VIEW PHOTOS</button>
+          <a href="#wishes" onClick={(e) => { e.preventDefault(); scrollToSection('wishes'); }} className="nav-link">WISHES</a>
+          <button onClick={() => navigate('/gallery')} className="btn-pill">VIEW PHOTOS</button>
         </div>
       </nav>
 
       {/* 1. Portal Hero */}
       <section className="portal-hero">
         <div className="portal-stage">
-          {/* Layer 1: Background Images Slideshow (Fades between active/incoming buffers) */}
           <div ref={bgWrapRef} className="portal-bg-wrap">
             <img
               src={slides.active}
@@ -384,23 +382,18 @@ function App() {
             />
           </div>
 
-          {/* Layer 2: Duotone Wash */}
           <div ref={duotoneRef} className="portal-duotone"></div>
-
-          {/* Layer 3: Radial Veil */}
           <div className="portal-veil"></div>
 
-          {/* Layer 4: Two Solid Panels */}
           <div ref={leftPanelRef} className="portal-panel left"></div>
           <div ref={rightPanelRef} className="portal-panel right"></div>
+          <div ref={seamRef} className="portal-seam-line"></div>
 
-          {/* Layer 5: Traveling Accent Dots */}
           <div className="portal-center-dots">
             <div ref={dotTealRef} className="portal-dot teal-dot"></div>
             <div ref={dotAmberRef} className="portal-dot amber-dot"></div>
           </div>
 
-          {/* Layer 6: Splitting & Growing Wordmark */}
           <div ref={titleContainerRef} className="portal-title-container">
             <h1 className="portal-title">
               <span ref={spanLeftRef} className="span-left">HAPPY BIRTHDAY</span>
@@ -408,7 +401,6 @@ function App() {
             </h1>
           </div>
 
-          {/* Corner Metadata */}
           <div className="portal-meta top-left">SVR-2026 // BDAY</div>
           <div className="portal-meta top-right">EST. 08.03</div>
           <div className="portal-meta bottom-left">SCROLL TO UNCOVER</div>
@@ -420,7 +412,6 @@ function App() {
       <section id="statement" className="statement-fold">
         <div className="statement-numeral">01</div>
         
-        {/* Drifting and rotating circular image */}
         <div ref={circleWrapRef} className="statement-circle-wrap">
           <img src="/yashu/Snapchat-143669298.jpg" className="statement-circle-img" alt="Milestone memory circle" />
         </div>
@@ -468,7 +459,7 @@ function App() {
             You're one of the best things that's ever happened to me, and you've made my life happier in ways you'll never fully realize. I don't know what the future has planned, but I know I'll always be grateful that it brought you into my life. Thank you.
           </p>
           <div className="releases-actions">
-            <button className="btn-pill" onClick={() => setCurrentView('gallery')}>VIEW PHOTOS</button>
+            <button className="btn-pill" onClick={() => navigate('/gallery')}>VIEW PHOTOS</button>
           </div>
         </div>
 
@@ -485,14 +476,12 @@ function App() {
               const cardData = getCardMetadata(photoPath);
               const isTop = index === 0;
               
-              // Base stack parameters
               const offsetMultiplier = 1;
               const xOffset = index * 8 * offsetMultiplier;
               const yOffset = index * 6 * offsetMultiplier;
               const rOffset = index * 1.5 * (index % 2 === 0 ? 1 : -1);
               const scaleOffset = 1 - index * 0.03;
 
-              // Apply drag styles to the top card only
               let style: React.CSSProperties = {
                 zIndex: GF_PHOTOS.length - index,
                 transform: `translate(${xOffset}px, ${yOffset}px) rotate(${rOffset}deg) scale(${scaleOffset})`,
@@ -552,7 +541,6 @@ function App() {
 
           <div className="deck-controls">
             <div className="deck-dots">
-              {/* Render indicator dots matching the active stack */}
               {cards.map((_, i) => (
                 <div 
                   key={i} 
@@ -564,13 +552,10 @@ function App() {
         </div>
       </section>
 
-
-
-      {/* 5. About Birthday Chronicles Section (Signature 2-Column Theme Layout) */}
+      {/* 5. About Birthday Chronicles Section */}
       <section id="about" className="about-chronicles-section">
         <div className="about-numeral">03</div>
 
-        {/* Left Column: Info & Story */}
         <div className="about-info reveal">
           <h2 className="about-title">WHY "BIRTHDAY CHRONICLES"?</h2>
 
@@ -593,7 +578,6 @@ function App() {
           </div>
         </div>
 
-        {/* Right Column: Chronicle Chapter Cards Stack */}
         <div className="about-cards-stack reveal">
           <div className="chronicle-chapter-card amber-theme">
             <div className="chapter-badge">EDITION 01</div>
@@ -627,6 +611,60 @@ function App() {
         </div>
       </section>
 
+      {/* 5. Birthday Wishes Section */}
+      <section id="wishes" className="wishes-main-section reveal">
+        <div className="wishes-section-header">
+          <span className="label-caps" style={{ display: 'block', marginBottom: '16px' }}>
+            THE WISHES LOG<span className="accent-dot amber"></span>
+          </span>
+          <h2 className="section-heading">MESSAGES FROM LOVED ONES</h2>
+          <p className="wishes-section-sub">
+            Warm birthday wishes and heartfelt blessings recorded for your special day.
+          </p>
+        </div>
+
+        {/* Wishes Grid */}
+        <div className="wishes-grid">
+          {WISHES_MESSAGES.map((item, idx) => {
+            const accentColor = idx % 2 === 0 ? 'var(--amber)' : 'var(--teal)';
+            return (
+              <div key={item.id} className="wish-card">
+                <div className="wish-card-header">
+                  <div
+                    className="wish-avatar"
+                    style={{
+                      background: item.avatarColor || 'var(--secondary-ground)',
+                      borderColor: idx % 2 === 0 ? 'rgba(232, 145, 60, 0.3)' : 'rgba(46, 107, 114, 0.3)'
+                    }}
+                  >
+                    <User size={20} color={accentColor} />
+                  </div>
+                  <div className="wish-sender-info">
+                    <h3 className="wish-sender-name">{item.sender}</h3>
+                    <span className="wish-relationship" style={{ color: accentColor }}>
+                      {item.relationship}
+                    </span>
+                    {item.timestamp && (
+                      <span className="wish-time">{item.timestamp}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="wish-body">
+                  <Quote className="wish-quote-bg" size={28} />
+                  <p className="wish-text">{item.message}</p>
+                </div>
+
+                <div className="wish-footer" style={{ color: accentColor }}>
+                  <Heart size={12} fill={accentColor} color={accentColor} />
+                  <span>WISHED WITH LOVE</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* 6. Close Section */}
       <section className="close-section">
         <div className="close-top reveal">
@@ -645,8 +683,7 @@ function App() {
             </div>
           </div>
 
-          {/* Stationary Heart PNG Entrance filling the gap in conclusion */}
-          <div className="close-center-png-wrap" onClick={() => setCurrentView('wishes')}>
+          <div className="close-center-png-wrap" onClick={() => navigate('/special')}>
             <img
               src="/39926b66c9ddf7c0dcd85730eeabac8f-removebg-preview.png"
               className="stationary-png-img"
@@ -656,14 +693,12 @@ function App() {
               className="btn-pill btn-click-here"
               onClick={(e) => {
                 e.stopPropagation();
-                setCurrentView('wishes');
+                navigate('/special');
               }}
             >
               <ArrowUp size={14} color="var(--amber)" /> CLICK HERE
             </button>
           </div>
-
-
         </div>
 
         <div className="close-footer">
@@ -677,6 +712,30 @@ function App() {
         </div>
       </section>
     </>
+  );
+}
+
+function GalleryViewRoute() {
+  const navigate = useNavigate();
+  return <GalleryView onBack={() => navigate('/')} />;
+}
+
+function SpecialPageRoute() {
+  const navigate = useNavigate();
+  return <SpecialPage onBack={() => navigate('/')} />;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<MainPortalView />} />
+        <Route path="/gallery" element={<GalleryViewRoute />} />
+        <Route path="/special" element={<SpecialPageRoute />} />
+        <Route path="/wishes" element={<SpecialPageRoute />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

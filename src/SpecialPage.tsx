@@ -29,9 +29,6 @@ export const SpecialPage: React.FC<SpecialPageProps> = ({ onBack }) => {
   const chromaItems: ChromaItem[] = photos.map((photo, idx) => ({
     image: photo.url,
     title: photo.title,
-    subtitle: photo.caption,
-    handle: photo.date,
-    location: photo.location,
     borderColor: idx % 2 === 0 ? '#E8913C' : '#2E6B72',
     gradient: idx % 2 === 0
       ? 'linear-gradient(145deg, rgba(232, 145, 60, 0.2), var(--secondary-ground))'

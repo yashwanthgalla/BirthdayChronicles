@@ -8,6 +8,16 @@
   z-index: 2000;
 }
 
+/* Make photos colorful specifically in this gallery page section without affecting other sections */
+.gallery-page .chroma-overlay {
+  display: none !important;
+}
+
+.gallery-page .chroma-card .chroma-img-wrapper img {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 /* Gallery Header Navbar */
 .gallery-navbar {
   position: fixed;

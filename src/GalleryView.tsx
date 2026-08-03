@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { GF_PHOTOS } from './photos';
+import ChromaGrid from './ChromaGrid';
+import type { ChromaItem } from './ChromaGrid';
 import './GalleryView.css';
 
 interface GalleryViewProps {
   onBack: () => void;
 }
 
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 const GalleryView: React.FC<GalleryViewProps> = ({ onBack }) => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Jumble photo order dynamically on gallery view mount
+  const [shuffledPhotos] = useState<string[]>(() => shuffleArray(GF_PHOTOS));
 
   // Scroll to top when gallery opens
   useEffect(() => {
@@ -31,9 +45,19 @@ const GalleryView: React.FC<GalleryViewProps> = ({ onBack }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIdx]);
 
-  const filteredPhotos = GF_PHOTOS.filter((path) =>
+  const filteredPhotos = shuffledPhotos.filter((path) =>
     path.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const chromaItems: ChromaItem[] = filteredPhotos.map((path, idx) => ({
+    image: path,
+    title: '',
+    borderColor: idx % 2 === 0 ? '#E8913C' : '#2E6B72',
+    gradient: idx % 2 === 0
+      ? 'linear-gradient(145deg, rgba(232, 145, 60, 0.2), var(--secondary-ground))'
+      : 'linear-gradient(145deg, rgba(46, 107, 114, 0.2), var(--secondary-ground))',
+    onClick: () => setSelectedIdx(idx)
+  }));
 
   return (
     <div className="gallery-page">
@@ -68,28 +92,8 @@ const GalleryView: React.FC<GalleryViewProps> = ({ onBack }) => {
           </p>
         </header>
 
-        <div className="gallery-grid">
-          {filteredPhotos.map((path, idx) => {
-            const fileName = path.split('/').pop() || `Photo #${idx + 1}`;
-            return (
-              <div
-                key={path}
-                className="gallery-card"
-                onClick={() => setSelectedIdx(idx)}
-              >
-                <img
-                  src={path}
-                  alt={fileName}
-                  className="gallery-img"
-                  loading="lazy"
-                />
-                <div className="gallery-card-overlay">
-                  <span className="gallery-card-name">{fileName}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* ChromaGrid without any headings or dates */}
+        <ChromaGrid items={chromaItems} showInfo={false} />
       </main>
 
       {/* Lightbox Modal */}
