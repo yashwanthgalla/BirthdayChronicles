@@ -1,0 +1,432 @@
+/* ============================================================================
+   SPECIAL PAGE / US & WISHES VIEW STYLES
+   Matches exact design system of Souvenir Birthday Archive
+   ============================================================================ */
+
+.special-page-container {
+  min-height: 100vh;
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  position: relative;
+  padding-bottom: 60px;
+  overflow-x: hidden;
+}
+
+/* Nav Header */
+.special-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: rgba(10, 12, 14, 0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--hairlines);
+}
+
+.special-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--hairlines);
+  color: var(--ink);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.special-back-btn:hover {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+  transform: translateX(-3px);
+}
+
+.special-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.special-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hairlines);
+  color: var(--amber);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+/* Hero Section */
+.special-hero {
+  position: relative;
+  padding: 24px 48px 16px;
+  text-align: center;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Tabs */
+.special-tabs {
+  display: inline-flex;
+  gap: 8px;
+  background: var(--secondary-ground);
+  padding: 6px;
+  border-radius: 30px;
+  border: 1px solid var(--hairlines);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--secondary-ink);
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  color: var(--ink);
+  background: rgba(237, 231, 220, 0.05);
+}
+
+.tab-btn.active {
+  background: var(--ink);
+  color: var(--ground);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Section Box */
+.special-section {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 24px 48px 60px;
+}
+
+.section-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hairlines);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-heading {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.section-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Birthday Wishes Wall */
+.wishes-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 24px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 12px 0;
+  box-sizing: border-box;
+}
+
+.wish-card {
+  position: relative;
+  background: var(--secondary-ground);
+  border: 1px solid var(--hairlines);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  flex: 0 1 calc(25% - 18px);
+  min-width: 260px;
+  max-width: 320px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 1200px) {
+  .wish-card {
+    flex: 0 1 calc(33.333% - 16px);
+  }
+}
+
+@media (max-width: 850px) {
+  .wishes-grid {
+    gap: 16px;
+  }
+  .wish-card {
+    flex: 0 1 calc(50% - 16px);
+    min-width: 230px;
+  }
+}
+
+@media (max-width: 580px) {
+  .wishes-grid {
+    gap: 12px;
+  }
+  .wish-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+.wish-card:nth-child(odd):hover {
+  border-color: var(--amber);
+  box-shadow: 0 16px 36px rgba(232, 145, 60, 0.15);
+}
+
+.wish-card:nth-child(even):hover {
+  border-color: var(--teal);
+  box-shadow: 0 16px 36px rgba(46, 107, 114, 0.15);
+}
+
+.wish-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.wish-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--hairlines);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.wish-sender-info {
+  width: 100%;
+  text-align: center;
+}
+
+.wish-sender-name {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wish-relationship {
+  display: block;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.wish-time {
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.wish-body {
+  position: relative;
+  margin-bottom: 20px;
+  min-height: 70px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wish-quote-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(237, 231, 220, 0.04);
+}
+
+.wish-text {
+  position: relative;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--secondary-ink);
+  text-align: center;
+  z-index: 1;
+}
+
+.wish-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  color: var(--amber);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairlines);
+  width: 100%;
+}
+
+/* Lightbox */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 12, 14, 0.92);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 800px;
+  width: 100%;
+  background: var(--ground);
+  border: 1px solid var(--hairlines);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(237, 231, 220, 0.1);
+  border: none;
+  color: var(--ink);
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.lightbox-image-wrap {
+  width: 100%;
+  max-height: 60vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.lightbox-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lightbox-details {
+  padding: 32px;
+}
+
+.lightbox-details h2 {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  margin: 12px 0 6px;
+  color: var(--ink);
+}
+
+.lightbox-details p {
+  color: var(--secondary-ink);
+  font-size: 14px;
+}
+
+/* Special Page Footer */
+.special-footer {
+  text-align: center;
+  margin-top: 60px;
+  padding: 40px 20px;
+  border-top: 1px solid var(--hairlines);
+}
+
+.special-footer p {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .special-hero { padding: 20px 24px 16px; }
+  .special-nav { padding: 16px 24px; }
+  .special-section { padding: 20px 24px 48px; }
+  .section-header-box { flex-direction: column; align-items: flex-start; }
+}
