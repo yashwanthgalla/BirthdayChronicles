@@ -9,7 +9,7 @@ import GalleryView from './GalleryView';
 import SpecialPage from './SpecialPage';
 import ProtectedRoute from './ProtectedRoute';
 import { logoutUser } from './authConfig';
-import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight, Lock, ExternalLink, Sparkles } from 'lucide-react';
 
 // Single Wish Message Carousel with left photo & right message matter
 export function WishesCarousel() {
@@ -723,7 +723,15 @@ function MainPortalView() {
             </p>
             <div className="chapter-footer">
               <span>SVR-2025</span>
-              <span>VOL. I</span>
+              <a
+                href="https://thefirstwish.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="chapter-vol-link"
+                title="Visit Vol 1: The First Wish"
+              >
+                VOL. I <ExternalLink size={12} style={{ marginLeft: '4px' }} />
+              </a>
             </div>
           </div>
 
@@ -759,6 +767,15 @@ function MainPortalView() {
             </div>
             <div className="close-actions">
               <button className="btn-outline" onClick={() => scrollToSection('portal-hero')}>BACK TO TOP</button>
+              <a
+                href="https://thefirstwish.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline vol1-btn"
+                title="Open Vol 1: The First Wish Deployment"
+              >
+                <Sparkles size={14} color="var(--amber)" /> VOL. 1 DEPLOYMENT <ExternalLink size={14} />
+              </a>
             </div>
           </div>
 
@@ -783,6 +800,17 @@ function MainPortalView() {
         <div className="close-footer">
           <div className="close-footer-bar">
             <span>© 2026 BIRTHDAY CHRONICLES. ALL RIGHTS RESERVED FOR YASHU.</span>
+            <a
+              href="https://thefirstwish.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-vol1-link"
+              title="Visit Vol 1: The First Wish"
+            >
+              <Sparkles size={12} color="var(--amber)" />
+              <span>VOL. 1: THE FIRST WISH</span>
+              <ExternalLink size={12} />
+            </a>
             <span>DESIGNED BY YASHWANTH GALLA</span>
           </div>
           <div className="close-big-wordmark">

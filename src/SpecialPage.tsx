@@ -6,7 +6,9 @@ import {
   Calendar,
   MapPin,
   X,
-  Heart
+  Heart,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 import type { UsPhoto } from './wishesData';
 import { US_PHOTOS } from './wishesData';
@@ -144,9 +146,20 @@ export const SpecialPage: React.FC<SpecialPageProps> = ({ onBack }) => {
       {/* Special Page Footer */}
       <footer className="special-footer">
         <p>BUILT WITH INTENTION & CARE • SOUVENIR ARCHIVE</p>
-        <button className="btn-outline" onClick={onBack}>
-          <ArrowLeft size={14} /> BACK TO MAIN PORTAL
-        </button>
+        <div className="special-footer-actions">
+          <button className="btn-outline" onClick={onBack}>
+            <ArrowLeft size={14} /> BACK TO MAIN PORTAL
+          </button>
+          <a
+            href="https://thefirstwish.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline vol1-btn"
+            title="Open Vol 1: The First Wish Deployment"
+          >
+            <Sparkles size={14} color="var(--amber)" /> VOL. 1 (2025) <ExternalLink size={14} />
+          </a>
+        </div>
       </footer>
     </div>
   );

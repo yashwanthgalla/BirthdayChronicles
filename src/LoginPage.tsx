@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, AlertCircle, ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
 import { loginUser } from './authConfig';
 import './LoginPage.css';
 
@@ -123,6 +123,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             )}
           </button>
         </form>
+
+        <div className="login-footer-info">
+          <a
+            href="https://thefirstwish.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="login-vol1-link"
+            title="Visit Vol 1: The First Wish Deployment"
+          >
+            <Sparkles size={13} color="var(--amber, #E8A84C)" />
+            <span>VISIT VOL. 1: THE FIRST WISH</span>
+            <ExternalLink size={13} />
+          </a>
+        </div>
       </div>
     </div>
   );
