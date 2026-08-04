@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Card.css';
 
 const PHOTOS = [
-  "/yashu/IMG-20250815-WA0001.jpg",
-  "/yashu/IMG-20250815-WA0002.jpg",
-  "/yashu/IMG-20250815-WA0004.jpg",
-  "/yashu/IMG-20250815-WA0006.jpg",
-  "/yashu/IMG_0311[1].JPG",
-  "/yashu/IMG_0624[1].JPG",
-  "/yashu/photo_2026-03-24_16-30-25.jpg"
+  "/ammu/IMG-20250815-WA0001.jpg",
+  "/ammu/IMG-20250815-WA0002.jpg",
+  "/ammu/IMG-20250815-WA0004.jpg",
+  "/ammu/IMG-20250815-WA0006.jpg",
+  "/ammu/IMG_0311[1].JPG",
+  "/ammu/IMG_0624[1].JPG",
+  "/ammu/photo_2026-03-24_16-30-25.jpg"
 ];
 
 // Duplicate photos array to enable seamless infinite continuous scrolling

@@ -45,7 +45,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
 
   const demo: ChromaItem[] = [
     {
-      image: '/yashu/IMG-20250815-WA0001.jpg',
+      image: '/ammu/IMG-20250815-WA0001.jpg',
       title: 'Moments',
       subtitle: 'Memories & Frequencies',
       handle: 'SVR-01',
@@ -54,7 +54,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
       location: 'BDAY ARCHIVE'
     },
     {
-      image: '/yashu/IMG-20250815-WA0002.jpg',
+      image: '/ammu/IMG-20250815-WA0002.jpg',
       title: 'Golden Hour',
       subtitle: 'Sunset Cadence',
       handle: 'SVR-02',
@@ -63,7 +63,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
       location: 'TOKYO, JP'
     },
     {
-      image: '/yashu/IMG-20250815-WA0004.jpg',
+      image: '/ammu/IMG-20250815-WA0004.jpg',
       title: 'Reflections',
       subtitle: 'Stillness in Motion',
       handle: 'SVR-03',
@@ -72,7 +72,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
       location: 'PARIS, FR'
     },
     {
-      image: '/yashu/IMG-20250815-WA0006.jpg',
+      image: '/ammu/IMG-20250815-WA0006.jpg',
       title: 'Souvenir',
       subtitle: 'Aura of Her',
       handle: 'SVR-04',
@@ -81,7 +81,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
       location: 'AMALFI, IT'
     },
     {
-      image: '/yashu/IMG_0311[1].JPG',
+      image: '/ammu/IMG_0311[1].JPG',
       title: 'Harmony',
       subtitle: 'Echoes of Summer',
       handle: 'SVR-05',
@@ -90,7 +90,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
       location: 'NEW YORK, US'
     },
     {
-      image: '/yashu/IMG_0624[1].JPG',
+      image: '/ammu/IMG_0624[1].JPG',
       title: 'Velvet Nights',
       subtitle: 'Midnight Echoes',
       handle: 'SVR-06',

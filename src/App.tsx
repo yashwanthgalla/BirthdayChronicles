@@ -179,7 +179,7 @@ function getCardMetadata(path: string) {
   };
 }
 
-const FIRST_HERO_IMAGE = "/yashu/IMG-20250815-WA0005.jpg";
+const FIRST_HERO_IMAGE = "/ammu/IMG-20250815-WA0005.jpg";
 
 function MainPortalView() {
   const navigate = useNavigate();
@@ -530,7 +530,7 @@ function MainPortalView() {
         <div className="statement-numeral">01</div>
         
         <div ref={circleWrapRef} className="statement-circle-wrap">
-          <img src="/yashu/Snapchat-143669298.jpg" className="statement-circle-img" alt="Milestone memory circle" />
+          <img src="/ammu/Snapchat-143669298.jpg" className="statement-circle-img" alt="Milestone memory circle" />
         </div>
 
         <div className="statement-wrapper">
