@@ -89,7 +89,7 @@ export const SpecialPage: React.FC<SpecialPageProps> = ({ onBack }) => {
             </div>
             <div className="section-meta-info">
               <Calendar size={13} />
-              <span>COLLECTION FROM THE /US FOLDER</span>
+              <span>COLLECTION TO SEE</span>
             </div>
           </div>
 

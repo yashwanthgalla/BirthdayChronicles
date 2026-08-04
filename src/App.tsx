@@ -7,7 +7,9 @@ import { WISHES_MESSAGES } from './wishesData';
 import Card from './Card';
 import GalleryView from './GalleryView';
 import SpecialPage from './SpecialPage';
-import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import ProtectedRoute from './ProtectedRoute';
+import { logoutUser } from './authConfig';
+import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 
 // Single Wish Message Carousel with left photo & right message matter
 export function WishesCarousel() {
@@ -459,6 +461,24 @@ function MainPortalView() {
           <a href="#wishes" onClick={(e) => { e.preventDefault(); scrollToSection('wishes'); }} className="nav-link">WISHES</a>
           <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }} className="nav-link">ABOUT</a>
           <button onClick={() => navigate('/gallery')} className="btn-pill">VIEW PHOTOS</button>
+          <button 
+            onClick={() => {
+              logoutUser();
+              window.location.reload();
+            }} 
+            className="btn-pill"
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.1)', 
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              color: '#FFFFFF',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            title="Lock Website & Logout"
+          >
+            <Lock size={12} /> LOCK
+          </button>
         </div>
       </nav>
 
@@ -787,13 +807,15 @@ function SpecialPageRoute() {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<MainPortalView />} />
-        <Route path="/gallery" element={<GalleryViewRoute />} />
-        <Route path="/special" element={<SpecialPageRoute />} />
-        <Route path="/wishes" element={<SpecialPageRoute />} />
-      </Routes>
+      <ProtectedRoute>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<MainPortalView />} />
+          <Route path="/gallery" element={<GalleryViewRoute />} />
+          <Route path="/special" element={<SpecialPageRoute />} />
+          <Route path="/wishes" element={<SpecialPageRoute />} />
+        </Routes>
+      </ProtectedRoute>
     </BrowserRouter>
   );
 }
