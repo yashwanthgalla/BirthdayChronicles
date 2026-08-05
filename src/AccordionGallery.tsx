@@ -182,6 +182,8 @@ const AccordionGallery: React.FC<AccordionGalleryProps> = ({
     []
   );
 
+  const [modalImage, setModalImage] = useState<string | null>(null);
+
   const handleEnter = (i: number) => {
     if (trigger === 'hover') setActive(i);
   };
@@ -190,6 +192,8 @@ const AccordionGallery: React.FC<AccordionGalleryProps> = ({
     if (i !== active) {
       e.preventDefault();
       setActive(i);
+    } else {
+      setModalImage(items[i].image);
     }
   };
 
@@ -204,54 +208,77 @@ const AccordionGallery: React.FC<AccordionGalleryProps> = ({
   };
 
   return (
-    <div
-      ref={rootRef}
-      className={`accordion-gallery${vertical ? ' accordion-gallery--vertical' : ''}${className ? ` ${className}` : ''}`}
-      style={
-        {
-          '--ag-accent': accentColor,
-          '--ag-overlay': overlayColor,
-          '--ag-text': textColor,
-          '--ag-gap': `${gap}px`,
-          '--ag-radius': `${radius}px`,
-          height: vertical ? `${Math.round(height * 1.6)}px` : `${height}px`
-        } as React.CSSProperties
-      }
-      role="list"
-      aria-label="Image accordion gallery"
-    >
-      {items.map((item, i) => {
-        const isActive = i === active;
-        const isLink = Boolean(item.link);
+    <>
+      <div
+        ref={rootRef}
+        className={`accordion-gallery${vertical ? ' accordion-gallery--vertical' : ''}${className ? ` ${className}` : ''}`}
+        style={
+          {
+            '--ag-accent': accentColor,
+            '--ag-overlay': overlayColor,
+            '--ag-text': textColor,
+            '--ag-gap': `${gap}px`,
+            '--ag-radius': `${radius}px`,
+            height: vertical ? `${Math.round(height * 1.5)}px` : `${height}px`
+          } as React.CSSProperties
+        }
+        role="list"
+        aria-label="Image accordion gallery"
+      >
+        {items.map((item, i) => {
+          const isActive = i === active;
+          const isLink = Boolean(item.link);
 
-        const content = (
-          <>
-            <span className="ag-panel__frame">
-              <span className="ag-panel__media" ref={el => { mediaRefs.current[i] = el; }}>
-                <img src={item.image} alt={item.alt || item.label || ''} draggable="false" />
-              </span>
-              <span className="ag-panel__overlay" aria-hidden="true" />
-            </span>
-            {showLabels && (
-              <span className="ag-panel__label" aria-hidden="true">
-                <span className="ag-panel__bar" ref={el => { barRefs.current[i] = el; }} />
-                <span className="ag-panel__text" ref={el => { textRefs.current[i] = el; }}>
-                  {item.label}
+          const content = (
+            <>
+              <span className="ag-panel__frame">
+                <span className="ag-panel__media" ref={el => { mediaRefs.current[i] = el; }}>
+                  <img src={item.image} alt={item.alt || item.label || ''} draggable="false" />
                 </span>
+                <span className="ag-panel__overlay" aria-hidden="true" />
               </span>
-            )}
-          </>
-        );
+              {showLabels && (
+                <span className="ag-panel__label" aria-hidden="true">
+                  <span className="ag-panel__bar" ref={el => { barRefs.current[i] = el; }} />
+                  <span className="ag-panel__text" ref={el => { textRefs.current[i] = el; }}>
+                    {item.label}
+                  </span>
+                </span>
+              )}
+            </>
+          );
 
-        if (isLink) {
+          if (isLink) {
+            return (
+              <a
+                key={i}
+                ref={el => { panelRefs.current[i] = el; }}
+                className={`ag-panel${isActive ? ' ag-panel--active' : ''}`}
+                style={{ borderRadius: `${radius}px` }}
+                href={item.link}
+                onClick={e => handleClick(i, e)}
+                onPointerDown={() => setActive(i)}
+                onMouseEnter={() => handleEnter(i)}
+                onFocus={() => setActive(i)}
+                onKeyDown={e => handleKeyDown(i, e)}
+                role="listitem"
+                tabIndex={0}
+                aria-current={isActive ? 'true' : undefined}
+                aria-label={item.label}
+              >
+                {content}
+              </a>
+            );
+          }
+
           return (
-            <a
+            <div
               key={i}
               ref={el => { panelRefs.current[i] = el; }}
               className={`ag-panel${isActive ? ' ag-panel--active' : ''}`}
               style={{ borderRadius: `${radius}px` }}
-              href={item.link}
               onClick={e => handleClick(i, e)}
+              onPointerDown={() => setActive(i)}
               onMouseEnter={() => handleEnter(i)}
               onFocus={() => setActive(i)}
               onKeyDown={e => handleKeyDown(i, e)}
@@ -261,30 +288,67 @@ const AccordionGallery: React.FC<AccordionGalleryProps> = ({
               aria-label={item.label}
             >
               {content}
-            </a>
+            </div>
           );
-        }
+        })}
+      </div>
 
-        return (
-          <div
-            key={i}
-            ref={el => { panelRefs.current[i] = el; }}
-            className={`ag-panel${isActive ? ' ag-panel--active' : ''}`}
-            style={{ borderRadius: `${radius}px` }}
-            onClick={e => handleClick(i, e)}
-            onMouseEnter={() => handleEnter(i)}
-            onFocus={() => setActive(i)}
-            onKeyDown={e => handleKeyDown(i, e)}
-            role="listitem"
-            tabIndex={0}
-            aria-current={isActive ? 'true' : undefined}
-            aria-label={item.label}
+      {modalImage && (
+        <div
+          className="gallery-modal-overlay"
+          onClick={() => setModalImage(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            background: 'rgba(5, 7, 10, 0.92)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <button
+            onClick={() => setModalImage(null)}
+            aria-label="Close full preview"
+            style={{
+              position: 'absolute',
+              top: '24px',
+              right: '24px',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              color: '#FFFFFF',
+              fontSize: '24px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            {content}
-          </div>
-        );
-      })}
-    </div>
+            {"✕"}
+          </button>
+          <img
+            src={modalImage}
+            alt="Full resolution preview"
+            style={{
+              maxWidth: '92vw',
+              maxHeight: '90vh',
+              borderRadius: '16px',
+              objectFit: 'contain',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8)'
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

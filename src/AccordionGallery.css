@@ -65,7 +65,7 @@
 
 .accordion-gallery--vertical .ag-panel__media {
   width: 100%;
-  height: var(--ag-media-size);
+  height: 100%;
 }
 
 .ag-panel__media img {
@@ -125,15 +125,14 @@
   .accordion-gallery {
     flex-direction: column;
     perspective: none;
-    height: auto !important;
   }
   .ag-panel {
-    min-height: 84px;
+    min-height: 70px;
     transform: none !important;
   }
   .accordion-gallery .ag-panel__media {
     width: 100%;
-    height: var(--ag-media-size);
+    height: 100%;
   }
 }
 
