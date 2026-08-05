@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import './SpecialPage.css';
 import { GF_PHOTOS } from './photos';
 import { WISHES_MESSAGES } from './wishesData';
 import Card from './Card';
+import DepthCarousel from './DepthCarousel';
+import AccordionGallery from './AccordionGallery';
 import GalleryView from './GalleryView';
 import SpecialPage from './SpecialPage';
 import ProtectedRoute from './ProtectedRoute';
 import { logoutUser } from './authConfig';
-import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight, Lock, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowUp, Quote, Heart, ChevronLeft, ChevronRight, Lock, ExternalLink, Sparkles, Volume2, VolumeX } from 'lucide-react';
 
 // Single Wish Message Carousel with left photo & right message matter
 export function WishesCarousel() {
@@ -108,6 +110,476 @@ export function WishesCarousel() {
   );
 }
 
+const ACCORDION_POEM = `"నచ్చేసావే మల్లెగంప
+నీ అందాలే నాలో దింప
+ఏం తిన్నావో కాయ దుంప
+నీ యవ్వారం జరదా ముంప
+
+నీ చుట్టూరా కళ్ళేసి
+లోగుట్టే నమిలేసి
+లొట్టెసి ఊరాయి
+నోట నీళ్లు
+
+నీ సింగారాన్ని చూత్తావుంటే
+సొంగకార్చుకుందే
+గుండె బెంగ నిదరని మింగే హంగే
+చెయ్యలేసే చెయ్యలేసే"`;
+
+// Animated Handwriting Text component that types Telugu graphemes letter-by-letter in a loop
+export function AnimatedHandwritingText({ text = ACCORDION_POEM }: { text?: string }) {
+  const [displayedCount, setDisplayedCount] = useState(0);
+
+  const graphemes = useMemo(() => {
+    if (typeof Intl !== 'undefined' && (Intl as any).Segmenter) {
+      const segmenter = new (Intl as any).Segmenter('te', { granularity: 'grapheme' });
+      return Array.from(segmenter.segment(text), (s: any) => s.segment);
+    }
+    return Array.from(text);
+  }, [text]);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | number;
+    let current = 0;
+    const total = graphemes.length;
+
+    const typeNext = () => {
+      if (current <= total) {
+        setDisplayedCount(current);
+        current++;
+        timer = setTimeout(typeNext, 120);
+      } else {
+        timer = setTimeout(() => {
+          current = 0;
+          setDisplayedCount(0);
+          timer = setTimeout(typeNext, 400);
+        }, 4000);
+      }
+    };
+
+    timer = setTimeout(typeNext, 300);
+
+    return () => clearTimeout(timer as number);
+  }, [graphemes]);
+
+  return (
+    <div className="animated-handwriting-wrapper" aria-label={text}>
+      <span className="handwriting-text">
+        {graphemes.map((char, index) => {
+          if (char === '\n') {
+            return <br key={index} />;
+          }
+          return (
+            <span
+              key={index}
+              className={`handwriting-letter ${index < displayedCount ? 'visible' : ''}`}
+            >
+              {char === ' ' ? '\u00A0' : char}
+            </span>
+          );
+        })}
+      </span>
+      <span className="handwriting-cursor">|</span>
+    </div>
+  );
+}
+
+const AA_MUKKU_AUDIO_SRC = encodeURI('/Aa Mukku Pai Pettikopam - Chikiri Chikiri _ Mohit Chauhan _ Peddi _ Telugu.mp3');
+
+export const AA_MUKKU_TIMED_LYRICS = [
+  { id: 0, time: 3.0, endTime: 5.9, text: 'ఆ ముక్కు పై పెట్టి కోపం', stanza: 1 },
+  { id: 1, time: 5.9, endTime: 8.8, text: 'తొక్కేసావే ముక్కెర అందం', stanza: 1 },
+  { id: 2, time: 8.8, endTime: 11.8, text: 'చింతాకులా ఉందే పాదం', stanza: 1 },
+  { id: 3, time: 11.8, endTime: 15.0, text: 'చిరాకులే నడిచే వాటం', stanza: 1 },
+
+  { id: 4, time: 15.0, endTime: 17.4, text: 'ఏం బుగ్గవో అందాలు', stanza: 2 },
+  { id: 5, time: 17.4, endTime: 19.8, text: 'ఒళ్ళంతా వంకీలు', stanza: 2 },
+  { id: 6, time: 19.8, endTime: 22.2, text: 'నీ మధ్యే దాగిందా', stanza: 2 },
+  { id: 7, time: 22.2, endTime: 25.0, text: 'తాటి కల్లు', stanza: 2 },
+
+  { id: 8, time: 25.0, endTime: 28.3, text: 'కూసింతే చూత్తే నీలో వగలు', stanza: 3 },
+  { id: 9, time: 28.3, endTime: 31.0, text: 'రాసేత్తారుగా ఎకరాలు', stanza: 3 },
+  { id: 10, time: 31.0, endTime: 33.6, text: 'నువ్వే నడిచిన చోటంతా', stanza: 3 },
+  { id: 11, time: 33.6, endTime: 9999, text: 'పొర్లు దండాలు', stanza: 3 }
+];
+
+export function SyncedKaraokeLyrics({
+  lines,
+  currentTime,
+  isPlaying,
+  label = "Song Lyrics"
+}: {
+  lines: typeof AA_MUKKU_TIMED_LYRICS;
+  currentTime: number;
+  isPlaying: boolean;
+  label?: string;
+}) {
+  return (
+    <div className="synced-karaoke-wrapper" aria-label={label}>
+      <div className="karaoke-quote-mark">“</div>
+
+      {/* Stanza 1 */}
+      <div className="karaoke-stanza">
+        {lines.slice(0, 4).map(line => {
+          const isActive = isPlaying && currentTime >= line.time && currentTime < line.endTime;
+          const isPassed = currentTime >= line.endTime;
+          return (
+            <div
+              key={line.id}
+              className={`karaoke-line ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+            >
+              {line.text}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Stanza 2 */}
+      <div className="karaoke-stanza">
+        {lines.slice(4, 8).map(line => {
+          const isActive = isPlaying && currentTime >= line.time && currentTime < line.endTime;
+          const isPassed = currentTime >= line.endTime;
+          return (
+            <div
+              key={line.id}
+              className={`karaoke-line ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+            >
+              {line.text}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Stanza 3 */}
+      <div className="karaoke-stanza">
+        {lines.slice(8, 12).map(line => {
+          const isActive = isPlaying && currentTime >= line.time && currentTime < line.endTime;
+          const isPassed = currentTime >= line.endTime;
+          return (
+            <div
+              key={line.id}
+              className={`karaoke-line ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
+            >
+              {line.text}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="karaoke-quote-mark end">”</div>
+    </div>
+  );
+}
+
+export function MemoriesSection({ memoriesItems }: { memoriesItems: any[] }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    const audio = new Audio(AA_MUKKU_AUDIO_SRC);
+    audio.volume = 0.5; // 50% volume as requested
+    audio.loop = true;
+    audioRef.current = audio;
+
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+
+    return () => {
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.pause();
+    };
+  }, []);
+
+  const fadeTimerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          const audio = audioRef.current;
+          if (!audio) return;
+
+          if (entry.isIntersecting) {
+            if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+            audio.volume = 0.5;
+            audio.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {
+              // Fallback if browser requires interaction
+            });
+          } else {
+            if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+            let currentVol = audio.volume;
+            fadeTimerRef.current = setInterval(() => {
+              currentVol -= 0.05;
+              if (currentVol <= 0.02) {
+                clearInterval(fadeTimerRef.current);
+                audio.volume = 0;
+                audio.pause();
+                audio.volume = 0.5;
+                setIsPlaying(false);
+              } else {
+                audio.volume = currentVol;
+              }
+            }, 40);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+    };
+  }, []);
+
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = !audio.muted;
+    setIsMuted(audio.muted);
+    if (!audio.muted && audio.paused) {
+      audio.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  };
+
+  return (
+    <section id="memories" ref={sectionRef} className="memories-section reveal">
+      <div className="memories-audio-controls">
+        <button
+          onClick={toggleMute}
+          className="btn-audio-mute"
+          title={isMuted ? 'Unmute Song' : 'Mute Song'}
+          aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+        >
+          {isMuted ? (
+            <>
+              <VolumeX size={15} color="var(--amber)" />
+              <span>MUTED</span>
+            </>
+          ) : (
+            <>
+              <Volume2 size={15} color="var(--amber)" />
+              <span>AUDIO ON</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="memories-frame-wrapper">
+        <div className="memories-side-badge">
+          <SyncedKaraokeLyrics
+            lines={AA_MUKKU_TIMED_LYRICS}
+            currentTime={currentTime}
+            isPlaying={isPlaying}
+            label="Aa Mukku Pai Petti Kopam Lyrics"
+          />
+        </div>
+
+        <div className="memories-carousel-container">
+          <DepthCarousel
+            items={memoriesItems}
+            cardWidth={355}
+            cardHeight={455}
+            radius={20}
+            depth={220}
+            spread={95}
+            tilt={22}
+            tiltDirection="right"
+            perspective={1400}
+            visibleCards={4}
+            falloff={0.2}
+            blur={6}
+            autoplay={true}
+            autoplayDelay={3200}
+            loop={true}
+            showControls={false}
+            showIndicators={false}
+            enableWheel={false}
+            random={true}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const NACHCHESAAVE_AUDIO_SRC = encodeURI('/Nachchesaave Mallegampa - Chikiri Chikiri _ Mohit Chauhan _ Peddi _ Telugu.mp3');
+
+export const NACHCHESAAVE_TIMED_LYRICS = [
+  { id: 0, time: 3.0, endTime: 5.8, text: 'నచ్చేసావే మల్లెగంప', stanza: 1 },
+  { id: 1, time: 5.8, endTime: 8.7, text: 'నీ అందాలే నాలో దింప', stanza: 1 },
+  { id: 2, time: 8.7, endTime: 11.8, text: 'ఏం తిన్నావో కాయ దుంప', stanza: 1 },
+  { id: 3, time: 11.8, endTime: 15.0, text: 'నీ యవ్వారం జరదా ముంప', stanza: 1 },
+
+  { id: 4, time: 15.0, endTime: 17.3, text: 'నీ చుట్టూరా కళ్ళేసి', stanza: 2 },
+  { id: 5, time: 17.3, endTime: 19.6, text: 'లోగుట్టే నమిలేసి', stanza: 2 },
+  { id: 6, time: 19.6, endTime: 22.0, text: 'లొట్టెసి ఊరాయి', stanza: 2 },
+  { id: 7, time: 22.0, endTime: 25.0, text: 'నోట నీళ్లు', stanza: 2 },
+
+  { id: 8, time: 25.0, endTime: 28.2, text: 'నీ సింగారాన్ని చూత్తావుంటే', stanza: 3 },
+  { id: 9, time: 28.2, endTime: 30.7, text: 'సొంగకార్చుకుందే', stanza: 3 },
+  { id: 10, time: 30.7, endTime: 33.5, text: 'గుండె బెంగ నిదరని మింగే హంగే', stanza: 3 },
+  { id: 11, time: 33.5, endTime: 9999, text: 'చెయ్యలేసే చెయ్యలేసే', stanza: 3 }
+];
+
+export function AccordionGallerySection({ accordionItems }: { accordionItems: any[] }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeTimerRef = useRef<any>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    const audio = new Audio(NACHCHESAAVE_AUDIO_SRC);
+    audio.volume = 0.5; // 50% volume requirement
+    audio.loop = true;
+    audioRef.current = audio;
+
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+
+    return () => {
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          const audio = audioRef.current;
+          if (!audio) return;
+
+          if (entry.isIntersecting) {
+            if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+            audio.volume = 0.5;
+            audio.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {
+              // Autoplay fallback
+            });
+          } else {
+            if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+            let currentVol = audio.volume;
+            fadeTimerRef.current = setInterval(() => {
+              currentVol -= 0.05;
+              if (currentVol <= 0.02) {
+                clearInterval(fadeTimerRef.current);
+                audio.volume = 0;
+                audio.pause();
+                audio.volume = 0.5;
+                setIsPlaying(false);
+              } else {
+                audio.volume = currentVol;
+              }
+            }, 40);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+    };
+  }, []);
+
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = !audio.muted;
+    setIsMuted(audio.muted);
+    if (!audio.muted && audio.paused) {
+      audio.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  };
+
+  return (
+    <section id="accordion-gallery" ref={sectionRef} className="accordion-section reveal">
+      <div className="accordion-audio-controls">
+        <button
+          onClick={toggleMute}
+          className="btn-audio-mute"
+          title={isMuted ? 'Unmute Song' : 'Mute Song'}
+          aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+        >
+          {isMuted ? (
+            <>
+              <VolumeX size={15} color="var(--amber)" />
+              <span>MUTED</span>
+            </>
+          ) : (
+            <>
+              <Volume2 size={15} color="var(--amber)" />
+              <span>AUDIO ON</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="accordion-container-wrap">
+        <div className="accordion-gallery-col">
+          <AccordionGallery
+            items={accordionItems}
+            defaultIndex={2}
+            expandRatio={0.52}
+            trigger="hover"
+            accentColor="var(--amber)"
+            overlayColor="#0a0c0e"
+            height={460}
+            showLabels={false}
+            grayscale={false}
+          />
+        </div>
+
+        <div className="accordion-lyrics-col">
+          <SyncedKaraokeLyrics
+            lines={NACHCHESAAVE_TIMED_LYRICS}
+            currentTime={currentTime}
+            isPlaying={isPlaying}
+            label="Nachchesaave Mallegampa Lyrics"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Scroll to top helper on route change
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -183,6 +655,36 @@ const FIRST_HERO_IMAGE = "/ammu/IMG-20250815-WA0005.jpg";
 
 function MainPortalView() {
   const navigate = useNavigate();
+
+  // Selected photo items for Memories 3D DepthCarousel
+  const memoriesItems = useMemo(() => {
+    const step = Math.max(1, Math.floor(GF_PHOTOS.length / 18));
+    const items: { image: string; alt: string }[] = [];
+    for (let i = 0; i < GF_PHOTOS.length && items.length < 18; i += step) {
+      items.push({
+        image: GF_PHOTOS[i],
+        alt: `Memory photo ${items.length + 1}`
+      });
+    }
+    return items;
+  }, []);
+
+  // Selected exact 5 photo items for AccordionGallery as requested by user
+  const accordionItems = useMemo(() => {
+    const selectedPhotos = [
+      "/ammu/IMG_20251219_174511_799.jpg",
+      "/ammu/IMG_20251219_224509_848.jpg",
+      "/ammu/photo_4_2026-08-03_16-49-03.jpg",
+      "/ammu/IMG_20251219_224449_707.jpg",
+      "/ammu/.trashed-1767193932-Snapchat-779559609.jpg"
+    ];
+    const labels = ["AMMU", "HER SMILE", "MOMENTS", "PARADISE", "TOGETHER"];
+    return selectedPhotos.map((img, idx) => ({
+      image: img,
+      label: labels[idx % labels.length],
+      alt: `Accordion photo ${idx + 1}`
+    }));
+  }, []);
 
   // Hero images array
   const [heroImages] = useState<string[]>([FIRST_HERO_IMAGE]);
@@ -458,6 +960,7 @@ function MainPortalView() {
         <div className="nav-links">
           <a href="#statement" onClick={(e) => { e.preventDefault(); scrollToSection('statement'); }} className="nav-link">INFO</a>
           <a href="#releases" onClick={(e) => { e.preventDefault(); scrollToSection('releases'); }} className="nav-link">MOMENTS</a>
+          <a href="#memories" onClick={(e) => { e.preventDefault(); scrollToSection('memories'); }} className="nav-link">MEMORIES</a>
           <a href="#wishes" onClick={(e) => { e.preventDefault(); scrollToSection('wishes'); }} className="nav-link">WISHES</a>
           <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }} className="nav-link">ABOUT</a>
           <button onClick={() => navigate('/gallery')} className="btn-pill">VIEW PHOTOS</button>
@@ -668,6 +1171,12 @@ function MainPortalView() {
           </div>
         </div>
       </section>
+
+      {/* 3.5 Memories Section with Auto Audio & Synced Karaoke */}
+      <MemoriesSection memoriesItems={memoriesItems} />
+
+      {/* 3.6 Accordion Gallery Section with Auto Audio & Synced Karaoke */}
+      <AccordionGallerySection accordionItems={accordionItems} />
 
       {/* 4. Birthday Wishes Section */}
       <section id="wishes" className="wishes-main-section reveal">
