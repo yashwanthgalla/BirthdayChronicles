@@ -448,18 +448,6 @@ export function AccordionGallerySection({ accordionItems }: { accordionItems: an
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
 
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   useEffect(() => {
     const audio = new Audio(NACHCHESAAVE_AUDIO_SRC);
     audio.volume = 0.5; // 50% volume requirement
@@ -569,12 +557,11 @@ export function AccordionGallerySection({ accordionItems }: { accordionItems: an
           <AccordionGallery
             items={accordionItems}
             defaultIndex={2}
-            expandRatio={isMobile ? 0.68 : 0.58}
+            expandRatio={0.52}
             trigger="hover"
             accentColor="var(--amber)"
             overlayColor="#0a0c0e"
-            height={isMobile ? 520 : 460}
-            orientation={isMobile ? 'vertical' : 'horizontal'}
+            height={460}
             showLabels={false}
             grayscale={false}
           />
@@ -801,11 +788,9 @@ function MainPortalView() {
       }
 
       if (spanLeftRef.current && spanRightRef.current) {
-        const isMobile = window.innerWidth <= 768;
-        const moveDist = isMobile ? 70 : 280;
-        const textTranslateLeft = eased * -moveDist;
-        const textTranslateRight = eased * moveDist;
-        const scale = 1 + eased * (isMobile ? 0.08 : 0.25);
+        const textTranslateLeft = eased * -280;
+        const textTranslateRight = eased * 280;
+        const scale = 1 + eased * 0.25;
         spanLeftRef.current.style.transform = `translate3d(${textTranslateLeft}px, 0, 0) scale(${scale})`;
         spanRightRef.current.style.transform = `translate3d(${textTranslateRight}px, 0, 0) scale(${scale})`;
       }
